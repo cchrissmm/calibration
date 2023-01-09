@@ -37,7 +37,7 @@ void setup() {
 
 void loop() {
   serialRX();
-  cal01.measure(GPIOmeas);
+  cal01.measure(GPIOmeas); //the ticker for the current filter
   delay(10);
 }
 
