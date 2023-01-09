@@ -53,20 +53,20 @@ void cal::calStart(String str, int measPin, int trigPin)
     }
 }
 
-//***read the input port a number of times and average it
-float cal::measure(int measPin)
-{
-    float measuredVal;
+// //***read the input port a number of times and average it
+// float cal::measure(int measPin)
+// {
+//     float measuredVal;
 
-    for (int i = 0; i < 10; i++)
-    {
-        measuredVal += analogRead(measPin);
-        delay(50);
-    }
-    float settledVal = measuredVal / 10;
+//     for (int i = 0; i < 10; i++)
+//     {
+//         measuredVal += analogRead(measPin);
+//         delay(50);
+//     }
+//     float settledVal = measuredVal / 10;
 
-    return settledVal;
-}
+//     return settledVal;
+// }
 
 //***get the linearfunc
 void cal::fitLinearEqn(int x1, int y1, int x2, int y2)
@@ -95,6 +95,18 @@ int cal::getCurrent(int measPin)
     Serial.println(current);
     return current;
 }
+
+//filter the raw value with a kaman filter to get a more stable value   
+int cal::measure(int measPin)
+{
+    int filteredValue = 0;
+    int measuredValue = analogRead(measPin);
+    int kamanValue = p_pt1Gain * (measuredValue - filteredValue);
+    filteredValue = filteredValue + kamanValue;
+
+    return filteredValue;
+}
+
 
 // void writeMeterCal(int startPos)
 // {

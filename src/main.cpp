@@ -32,5 +32,6 @@ void setup() {
 
 void loop() {
   serialRX();
+  cal01.measure(GPIOmeas);
 }
 
