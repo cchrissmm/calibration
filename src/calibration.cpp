@@ -5,62 +5,56 @@
 //"CALCUR00110,03000" meaning calibrate the current sensor expecting 110mA with no load and 3000mA with load"
 //"CALVOL12100" meaning calibrate the voltage sensor expecting 12100mV
 
-void calStart(String str, int measPin, int trigPin)
+// constructor
+cal::cal()
 {
-    if (str.startsWith("CALCUR")) // starting check for "CALCUR"
+}
+
+void cal::calStart(String str, int measPin, int trigPin)
+{
+    if (str.startsWith("CALCUR,")) // starting check for "CALCUR"
     {
         Serial.println("Current meter calibration request received: " + str);
-        String x1Str = str.substring(7, 11); // the index positions of the code
-        Serial.print("point 1: ");
-        Serial.println(x1Str);
-        String x2Str = str.substring(12, 16); // the index positions of the code
-        Serial.print("point 2: ");
-        Serial.println(x1Str);
-
-        int x1 = x1Str.toInt();
-        if (x1)
+        String y1Str = str.substring(7, 12); // the index positions of the code
+        Serial.print("point y1: ");
+        int y1 = y1Str.toInt();
+        Serial.println(y1);
+        if (!y1)
         {
-            Serial.println("point x1 looks good");
-        }
-        else
-        {
-            Serial.println("point x1 contains an error");
+            Serial.println("point y1 contains an error");
+            Serial.println(y1Str);
             return;
         }
-
-        int x2 = x2Str.toInt();
-        if (x2)
-        {
-            Serial.println("point x2 looks good");
-        }
-        else
-        {
-            Serial.println("point x2 contains an error");
-            return;
-        }
-
-        Serial.print("measuring y1 (output off state): ");
+        Serial.print("measuring x1 (output off state): ");
         analogWrite(trigPin, 0);
         delay(1000);
-        int y1 = measure(measPin);
-        Serial.println(y1);
+        int x1 = cal::measure(measPin);
+        Serial.println(x1);
 
-        Serial.print("measuring y2 (output on state): ");
-        analogWrite(trigPin, 255);
-        delay(1000);
-        int y2 = measure(measPin);
+        String y2Str = str.substring(13, 18); // the index positions of the code
+        Serial.print("point y2: ");
+        int y2 = y2Str.toInt();
         Serial.println(y2);
-
-        fitLinearEqn(x1, y1, x2, y2);
-        Serial.print("slope is ");
-       Serial.println(slope);
-        Serial.print("y int is ");
-       Serial.println(yIntercept);
-    }  
+        if (!y2)
+        {
+            Serial.println("point y2 contains an error");
+            Serial.println(y2Str);
+            return;
+        }
+      
+        Serial.print("measuring x2 (output on state): ");
+        analogWrite(trigPin, 255);
+        delay(3000);
+        int x2 = cal::measure(measPin);
+        Serial.println(x2);
+        analogWrite(trigPin, 0);
+        cal::fitLinearEqn(x1, y1, x2, y2);
+        cal::getCurrent(measPin);
+    }
 }
 
 //***read the input port a number of times and average it
-float measure(int measPin)
+float cal::measure(int measPin)
 {
     float measuredVal;
 
@@ -75,13 +69,31 @@ float measure(int measPin)
 }
 
 //***get the linearfunc
-void fitLinearEqn(int x1, int y1, int x2, int y2)
+void cal::fitLinearEqn(int x1, int y1, int x2, int y2)
 {
     // calculate the slope of the line
     slope = (y2 - y1) / (x2 - x1);
+    Serial.print("slope is ");
+    Serial.println(slope);
 
     // calculate the y-intercept of the line
     yIntercept = y1 - (slope * x1);
+    Serial.print("y int is ");
+    Serial.println(yIntercept);
+}
+
+int cal::getCurrent(int measPin)
+{
+    //***get the current reading
+    delay(1000);
+    int currentReading = cal::measure(measPin);
+
+    //***calculate the current
+    int current = (slope * currentReading) + yIntercept;
+    Serial.println(currentReading);
+    Serial.print(" input gives a measured current of (mA): ");
+    Serial.println(current);
+    return current;
 }
 
 // void writeMeterCal(int startPos)
