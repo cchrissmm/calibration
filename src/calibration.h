@@ -1,21 +1,23 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-static int p_pt1Gain = 0.5;
+static float p_pt1Gain = 0.1;
 
 class cal {
 public:
 cal();
 void calStart(String str, int measPin, int trigPin);
-int measure(int measPin);
+float measure(int measPin);
+void logDump();
 
 private:
-int slope;
-int yIntercept;
-int filteredValue;
+float slope = 0;
+float yIntercept = 0;
+int filteredValue = 0;
 
-void fitLinearEqn(int x1, int y1, int x2, int y2);
+void fitLinearEqn(float x1, float y1, float x2, float y2);
 int getCurrent(int measPin);
+float measCal(int measPin);
 };
 
 #endif 

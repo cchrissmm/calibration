@@ -19,6 +19,11 @@ void serialRX()
       Serial.println("Current meter calibration requested");
       cal01.calStart(str, GPIOmeas, GPIOtrig);
     }
+    if (str.startsWith("DUMP")) // starting check for "VAR"
+    {
+      Serial.println("log dump");
+      cal01.logDump();
+    }
   }
 }
 
@@ -33,5 +38,6 @@ void setup() {
 void loop() {
   serialRX();
   cal01.measure(GPIOmeas);
+  delay(10);
 }
 
