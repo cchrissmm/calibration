@@ -15,10 +15,10 @@ void serialRX()
   {
     String str = Serial.readStringUntil('\n');
 
-    if (str.startsWith("CALCUR")) // starting check for "VAR"
+    if (str.startsWith("CAL")) // starting check for "VAR"
     {
-      Serial.println("Current meter calibration requested");
-      cal01.calStart(str, GPIOcurrentMeas, GPIOtrig);
+      Serial.println("Sensor calibration requested");
+      cal01.calStart(str);
     }
     if (str.startsWith("DUMP")) // starting check for "VAR"
     {
@@ -35,7 +35,7 @@ void setup() {
   ledcSetup(0, p_PWM_Freq, p_PWM_Res);
   pinMode(GPIOvoltageMeas, INPUT);
 
-  cal01.setup(GPIOcurrentMeas, GPIOvoltageMeas);
+  cal01.setup(GPIOcurrentMeas, GPIOvoltageMeas, GPIOtrig);
   Serial.println("GPIO setup");
 }
 
