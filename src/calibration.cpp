@@ -17,6 +17,7 @@ void cal::setup(int cPin, int vPin, int tPin) {
     this -> currentPin = cPin;
     this -> voltagePin = vPin;
     this-> triggerPin = tPin;
+    Serial.println("calibration setup with pins current: " + String(cPin) + " voltage: " + String(vPin) + " trigger: " + String(tPin));
     cal::readCal();
 }
 
@@ -66,6 +67,7 @@ void cal::calStart(String str)
 
         cal::writeCurrentCal();
     }
+
     if (str.startsWith("CALVOL,")) // starting check for "CALVOL"
     {
         Serial.println("Voltage meter calibration request received: " + str);
