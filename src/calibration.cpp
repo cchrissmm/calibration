@@ -110,7 +110,7 @@ float cal::measCal(int measPin)
 //***get the linearfunc
 void cal::fitCurrentEqn(float x1, float y1, float x2, float y2)
 {
-    // calculate the currentSlope of the line
+    // calculate the slope of the line
     currentSlope = (y2 - y1) / (x2 - x1);
     Serial.print("currentSlope is ");
     Serial.println(currentSlope);
@@ -124,8 +124,8 @@ void cal::fitCurrentEqn(float x1, float y1, float x2, float y2)
 //***get the linearfunc
 void cal::fitVoltageEqn(float x1, float y1, float x2, float y2)
 {
-    // calculate the currentSlope of the line
-    currentSlope = (y2 - y1) / (x2 - x1);
+    // calculate the slope of the line
+    voltageSlope = (y2 - y1) / (x2 - x1);
     Serial.print("voltageSlope is ");
     Serial.println(voltageSlope);
 
