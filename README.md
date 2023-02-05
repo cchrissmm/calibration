@@ -2,6 +2,10 @@
 This is a routine to calibrate the onbaord ACS712 based current meter and the voltage divider based voltage meter. 
 
 # usage
+include the header
+
+`#include <calibration.h>`
+
 create an instance of the class:
 
 `cal cal01;`
@@ -26,3 +30,11 @@ GPIOtrig is the output pin connected to the load trigger
 
 typically app01 - 03 would be used 
 
+# serial
+its easy to trigger it from a erial input as
+
+`if (str.startsWith("CALCUR")) // starting check for "VAR"
+    {
+      Serial.println("Current meter calibration requested");
+      cal01.calStart(str, GPIOmeas, GPIOtrig);`
+    }

@@ -1,6 +1,7 @@
 #include <arduino.h>
 #include "calibration.h"
 #include "logger.h"
+#include <EEPROM.h>
 
 logger log01("measure","raw,filt");
 
@@ -9,8 +10,16 @@ logger log01("measure","raw,filt");
 //"CALVOL,12100" meaning calibrate the voltage sensor expecting 12100mV
 
 // constructor
-cal::cal()
-{
+cal::cal() {
+}
+
+void cal::setup(int cPin, int vPin) {
+    this -> currentPin = cPin;
+    this -> voltagePin = vPin;
+}
+
+void cal::task20ms() {
+    cal::getCurrentFilt(currentPin);
 }
 
 void cal::calStart(String str, int measPin, int trigPin)
@@ -107,12 +116,16 @@ int cal::getCurrent(int measPin)
 }
 
 // //filter the raw value with a kaman filter to get a more stable value   
-float cal::measure(int measPin)
+float cal::getCurrentFilt(int measPin)
 {
-    int measuredValue = analogRead(measPin);
-    float kamanValue = p_pt1Gain * (measuredValue - filteredValue);
+    //***get the current reading
+    float value = cal::measCal(measPin);
+
+    //***calculate the current
+    float current = (slope * value) + yIntercept;
+    float kamanValue = PT1GAIN_CURRENT * (current - filteredValue);
     filteredValue = filteredValue + kamanValue;
-    String log = String(measuredValue) + "," + String(filteredValue);
+    String log = String(current) + "," + String(filteredValue);
     log01.data(log);
     return filteredValue;
 }
