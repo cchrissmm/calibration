@@ -16,6 +16,7 @@ cal::cal() {
 void cal::setup(int cPin, int vPin) {
     this -> currentPin = cPin;
     this -> voltagePin = vPin;
+    cal::readMeterCal();
 }
 
 void cal::task20ms() {
@@ -66,6 +67,8 @@ void cal::calStart(String str, int measPin, int trigPin)
         cal::fitLinearEqn(x1, y1, x2, y2);
         cal::getCurrent(measPin);
         analogWrite(trigPin, 0);
+
+        cal::writeMeterCal();
     }
 }
 
@@ -90,15 +93,15 @@ float cal::measCal(int measPin)
 //***get the linearfunc
 void cal::fitLinearEqn(float x1, float y1, float x2, float y2)
 {
-    // calculate the slope of the line
-    slope = (y2 - y1) / (x2 - x1);
-    Serial.print("slope is ");
-    Serial.println(slope);
+    // calculate the currentSlope of the line
+    currentSlope = (y2 - y1) / (x2 - x1);
+    Serial.print("currentSlope is ");
+    Serial.println(currentSlope);
 
     // calculate the y-intercept of the line
-    yIntercept = y1 - (slope * x1);
+    currentYintercept = y1 - (currentSlope * x1);
     Serial.print("y int is ");
-    Serial.println(yIntercept);
+    Serial.println(currentYintercept);
 }
 
 int cal::getCurrent(int measPin)
@@ -107,7 +110,7 @@ int cal::getCurrent(int measPin)
     float value = cal::measCal(measPin);
 
     //***calculate the current
-    float current = (slope * value) + yIntercept;
+    float current = (currentSlope * value) + currentYintercept;
     Serial.print("input: ");
     Serial.println(value);
     Serial.print("gives a measured current of (mA): ");
@@ -122,7 +125,7 @@ float cal::getCurrentFilt(int measPin)
     float value = analogRead(measPin);
 
     //***calculate the current
-    float current = (slope * value) + yIntercept;
+    float current = (currentSlope * value) + currentYintercept;
     float kamanValue = PT1GAIN_CURRENT * (current - filteredValue);
     filteredValue = filteredValue + kamanValue;
     String log = String(current) + "," + String(filteredValue);
@@ -131,19 +134,25 @@ float cal::getCurrentFilt(int measPin)
 }
 
 
-// void writeMeterCal(int startPos)
-// {
-//     EEPROM.writeInt(startPos, data);
-//     Serial.println("Eeprom index: ");
-//     Serial.println(startPos);
-//     Serial.println("written with: ");
-//     Serial.println(data);
+void cal::writeMeterCal()
+{
+    EEPROM.writeFloat(60, currentSlope);
+    Serial.println("current slope of: " + String(currentSlope) + " written to EEPROM");
+    EEPROM.writeFloat(66, currentYintercept);
+    Serial.println("current y intercept of: " + String(currentYintercept) + " written to EEPROM");
+    EEPROM.commit();
+    Serial.println("Calibration EEPROM Write done, board will restart");
+    delay(1000);
+    ESP.restart(); // hard reset after variant coding
+}
 
-//     EEPROM.commit();
-//     Serial.println("Calibration EEPROM Write done, board will restart");
-//     delay(1000);
-//     ESP.restart(); // hard reset after variant coding
-// }
+void cal::readMeterCal()
+{
+    currentSlope = EEPROM.readFloat(60);
+    Serial.println("current slope of: " + String(currentSlope) + " read from EEPROM");
+    currentYintercept = EEPROM.readFloat(66);
+    Serial.println("current y intercept of: " + String(currentYintercept) + " read from EEPROM");
+}
 
 void cal::logDump()
 {
