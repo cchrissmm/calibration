@@ -119,7 +119,7 @@ int cal::getCurrent(int measPin)
 float cal::getCurrentFilt(int measPin)
 {
     //***get the current reading
-    float value = cal::measCal(measPin);
+    float value = analogRead(measPin);
 
     //***calculate the current
     float current = (slope * value) + yIntercept;
