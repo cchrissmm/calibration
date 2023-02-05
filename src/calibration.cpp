@@ -20,7 +20,7 @@ void cal::setup(int cPin, int vPin) {
 }
 
 void cal::task20ms() {
-    cal::getCurrentFilt(currentPin);
+    cal::getCurrentFilt();
 }
 
 void cal::calStart(String str, int measPin, int trigPin)
@@ -119,10 +119,10 @@ int cal::getCurrent(int measPin)
 }
 
 // //filter the raw value with a kaman filter to get a more stable value   
-float cal::getCurrentFilt(int measPin)
+float cal::getCurrentFilt()
 {
     //***get the current reading
-    float value = analogRead(measPin);
+    float value = analogRead(currentPin);
 
     //***calculate the current
     float current = (currentSlope * value) + currentYintercept;

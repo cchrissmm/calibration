@@ -9,7 +9,7 @@ cal();
     void setup(int cPin, int vPin);
     void task20ms();
     void calStart(String str, int measPin, int trigPin);
-    float getCurrentFilt(int measPin);
+    float getCurrentFilt();
     void logDump();
 
 private:
